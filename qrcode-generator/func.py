@@ -20,6 +20,15 @@ def generate_qrcodes():
     # Render the template with the QR codes
     return render_template('qrcodes.html', qr_code_image_red=qr_code_image_red, qr_code_image_blue=qr_code_image_blue)
 
+@application.route('/health/readiness')
+def readiness_check():
+    # Perform any readiness checks here
+    return jsonify({'status': 'ready'})
+
+@application.route('/health/liveness')
+def liveness_check():
+    # Perform any liveness checks here
+    return jsonify({'status': 'alive'})
 
 if __name__ == '__main__':
     application.run()
