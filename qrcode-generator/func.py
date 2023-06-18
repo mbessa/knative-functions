@@ -1,24 +1,36 @@
 from flask import Flask, render_template, jsonify
 import qrcode
+from qrcode.image.pure import PymagingImage
+import io
+import base64
 
-application = Flask(__name__)
+application = Flask(__name__, template_folder='templates')
 
 
 @application.route('/')
-def generate_qrcodes():
+def qrcodes():
+    qr_code_image_red_base64 = generate_qrcodes(color="red", payload="url-red")
+    qr_code_image_blue_base64 = generate_qrcodes(color="blue", payload="url-blue")
+    return render_template('qrcodes.html', qr_code_image_red_base64=qr_code_image_red_base64, qr_code_image_blue_base64=qr_code_image_blue_base64)
+
+
+def generate_qrcodes(color, payload):
     # Generate the QR codes
-    qr_code_red = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=4)
-    qr_code_red.add_data('Red QR Code Data')
-    qr_code_red.make(fit=True)
-    qr_code_image_red = qr_code_red.make_image(fill_color="red", back_color="white")
+    qr_code = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=20, border=4)
+    qr_code.add_data(payload)
+    qr_code.make(fit=True)
 
-    qr_code_blue = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=4)
-    qr_code_blue.add_data('Blue QR Code Data')
-    qr_code_blue.make(fit=True)
-    qr_code_image_blue = qr_code_blue.make_image(fill_color="blue", back_color="white")
+    # Create a colored QR code image using PymagingImage
+    qr_code_image = qr_code.make_image(fill_color='red', back_color="white", image_factory=PymagingImage)
 
-    # Render the template with the QR codes
-    return render_template('qrcodes.html', qr_code_image_red=qr_code_image_red, qr_code_image_blue=qr_code_image_blue)
+    # Convert the PIL image to a base64-encoded string
+    buffered = io.BytesIO()
+    qr_code_image.save(buffered, 'PNG')
+    qr_code_image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
+
+    return qr_code_image_base64
+
+
 
 @application.route('/health/readiness')
 def readiness_check():

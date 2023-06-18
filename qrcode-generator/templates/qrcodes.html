@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QR Codes</title>
+    <style>
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .qr-code {
+            margin: 200px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="qr-code">
+            <h2>Red Team!</h2>
+            <img src="data:image/png;base64,{{ qr_code_image_red_base64 }}" alt="Red QR Code"/>
+        </div>
+        <div class="qr-code">
+            <h2>Blue Team!</h2>
+            <img src="data:image/png;base64,{{ qr_code_image_blue_base64 }}" alt="Blue QR Code"/>
+        </div>
+    </div>
+</body>
+</html>
+
