@@ -1,6 +1,5 @@
 from flask import Flask, render_template, jsonify
 import qrcode
-from qrcode.image.pure import PymagingImage
 import io
 import base64
 
@@ -19,11 +18,9 @@ def generate_qrcodes(color, payload):
     qr_code = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=20, border=4)
     qr_code.add_data(payload)
     qr_code.make(fit=True)
+    qr_code_image = qr_code.make_image(fill_color=color, back_color="white")
 
-    # Create a colored QR code image using PymagingImage
-    qr_code_image = qr_code.make_image(fill_color='red', back_color="white", image_factory=PymagingImage)
-
-    # Convert the PIL image to a base64-encoded string
+    #Convert image to png base64 encoded
     buffered = io.BytesIO()
     qr_code_image.save(buffered, 'PNG')
     qr_code_image_base64 = base64.b64encode(buffered.getvalue()).decode("utf-8")
