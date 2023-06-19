@@ -1,45 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Thumbs Up or Down</title>
+    <title>QR Codes</title>
     <style>
-        .rating-container {
+        .container {
             display: flex;
+            justify-content: center;
             align-items: center;
+            height: 100vh;
         }
-        .rating-container label {
-            margin-right: 10px;
+
+        .qr-code {
+            margin: 200px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <h1>Welcome!</h1>
-    <form action="/submit" method="post">
-        <label for="name">Name:</label>
-        <input type="text" id="name" name="name" required><br><br>
-        
-        <div class="rating-container">
-            <label for="rating">Select a rating:</label>
-            <div>
-                <input type="radio" id="thumbs-up" name="rating" value="thumbs-up" required>
-                <label for="thumbs-up">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-                        <path d="M0 0h24v24H0z" fill="none"/>
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 16h-2v-2h2v2zm0-4h-2V7h2v7z"/>
-                    </svg>
-                </label>
-                
-                <input type="radio" id="rocket" name="rating" value="rocket" required>
-                <label for="rocket">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-                        <path d="M0 0h24v24H0z" fill="none"/>
-                        <path d="M3 17.25L5.84 15H3v2.25zM20 14c-1.65 0-3 1.35-3 3 0 .69.27 1.32.71 1.79l-1.43 1.43C15.46 20.22 16.08 20 16.75 20 19.87 20 22 22.13 22 25h2c0-3.87-3.13-7-7.03-7-.67 0-1.29.08-1.89.23l-1.4-1.4A2.99 2.99 0 0 1 17 14h3zm-1.25-4L15 11.5V9h-2v2.5L11.25 10 9 12.25V9H6v3.25L2 14V9H1v6h1v-2.5L5 11l2.25 2.25V15h2v-1.75L12.75 15H14v-3h-1.25L11 12.5V9h-2v3.5L7.75 11 6.5 12.25V9H4v6h1v-2.5L9 14l2.25-2.25V15h2v-2.75L15.75 15H17v-3h-1.25z"/>
-                    </svg>
-                </label>
-            </div>
+    <div class="container">
+        <div class="qr-code">
+            <img src="data:image/png;base64,{{ qr_code_image_base64 }}" alt="QR Code"/>
+            <h2>{{qr_payload}} </h2>
         </div>
-        
-        <button type="submit">Submit</button>
-    </form>
+    </div>
 </body>
 </html>
+
