@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rating App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 50px;
+        }
+
+        .rating-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .rating-icons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .rating-icons i {
+            font-size: 60px;
+            color: #888;
+            cursor: pointer;
+            transition: color 0.3s;
+            opacity: 0.4;
+        }
+
+        .rating-icons i.active {
+            color: #ffbf00;
+            opacity: 1;
+        }
+
+        .input-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .input-container input {
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .submit-button {
+            margin-top: 30px;
+        }
+
+        .rating-hint {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Rating App</h1>
+
+    <form id="ratingForm" action="/" method="post">
+        <div class="input-container">
+            <input type="text" id="name" name="name" placeholder="Enter your name" required>
+        </div>
+
+        <div class="rating-container">
+            <div class="rating-icons">
+                <i class="far fa-smile" id="smile"></i>
+                <i class="fas fa-thumbs-up" id="thumbs-up"></i>
+                <i class="fas fa-rocket" id="rocket"></i>
+            </div>
+            <div id="ratingHint" class="rating-hint"></div>
+        </div>
+
+        <input type="hidden" id="emoji" name="emoji">
+
+        <div class="submit-button">
+            <button type="submit" style="display: none;"></button>
+        </div>
+    </form>
+
+    <script>
+        const ratingForm = document.getElementById('ratingForm');
+        const ratingIcons = document.querySelectorAll('.rating-icons i');
+        const nameInput = document.getElementById('name');
+        const ratingHint = document.getElementById('ratingHint');
+        let selectedEmoji = '';
+    
+        ratingIcons.forEach(icon => {
+            icon.addEventListener('click', (event) => {
+                event.preventDefault(); // Prevent form submission
+                if (nameInput.value !== '') {
+                    ratingIcons.forEach(icon => icon.classList.remove('active'));
+                    icon.classList.add('active');
+                    selectedEmoji = icon.id;
+                    document.getElementById('emoji').value = selectedEmoji;
+                    ratingForm.submit(); // Trigger form submission
+                }
+            });
+        });
+    
+        nameInput.addEventListener('input', () => {
+            if (nameInput.value !== '') {
+                ratingIcons.forEach(icon => {
+                    icon.style.opacity = '1';
+                    icon.style.cursor = 'pointer';
+                    ratingHint.textContent = '';
+                });
+                document.getElementById('emoji').value = selectedEmoji; // Restore selected emoji
+            } else {
+                ratingIcons.forEach(icon => {
+                    icon.style.opacity = '0.4';
+                    icon.style.cursor = 'default';
+                    ratingHint.textContent = 'Please enter your name before rating';
+                });
+                selectedEmoji = ''; // Clear selected emoji when name is empty
+                document.getElementById('emoji').value = '';
+            }
+        });
+    
+        // After form submission, clear the selected emoji and reset the form
+        ratingForm.addEventListener('submit', () => {
+            selectedEmoji = '';
+            document.getElementById('emoji').value = '';
+            ratingIcons.forEach(icon => icon.classList.remove('active'));
+        });
+    
+        // Restore the name input value after form submission
+        const storedName = sessionStorage.getItem('name');
+        if (storedName) {
+            nameInput.value = storedName;
+        }
+    
+        // Store the name input value in session storage before form submission
+        nameInput.addEventListener('change', () => {
+            sessionStorage.setItem('name', nameInput.value);
+        });
+    </script>
+    
+    
+    
+</body>
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Emoji Time</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 50px;
+        }
+
+        .rating-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .rating-column {
+            flex: 1;
+            padding: 10px;
+        }
+
+        .team-heading {
+            font-size: 24px;
+        }
+
+        .rating-card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .emoji {
+            font-size: 40px;
+            margin: 10px;
+        }
+
+        .team-count {
+            font-size: 40px;
+            font-weight: bold;
+            color: #888;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Emoji Time</h1>
+
+    <div class="rating-container"></div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        const ratingsContainer = $('.rating-container');
+        let displayedRatings = [];
+    
+        // Function to get emoji based on text
+        function getEmoji(text) {
+            switch (text) {
+                case 'thumbs-up':
+                    return '👍';
+                case 'rocket':
+                    return '🚀';
+                case 'smile':
+                    return '😊';
+                default:
+                    return '';
+            }
+        }
+    
+        // Function to render ratings on the page
+        function renderRatings(ratings) {
+            ratingsContainer.empty();
+    
+            // Sort ratings by ID in descending order
+            ratings.sort((a, b) => b.id - a.id);
+    
+            // Create a dictionary to store ratings by team
+            const ratingsByTeam = {};
+    
+            // Group ratings by team
+            ratings.forEach(function(rating) {
+                if (!ratingsByTeam[rating.team]) {
+                    ratingsByTeam[rating.team] = {
+                        emojis: [],
+                        totalCount: 0
+                    };
+                }
+    
+                const team = ratingsByTeam[rating.team];
+    
+                team.emojis.unshift(rating.emoji); // Add newer emoji to the beginning
+                team.totalCount++;
+    
+                if (!displayedRatings.includes(rating.id)) {
+                    displayedRatings.push(rating.id); // Track displayed rating
+                    setTimeout(() => {
+                        const index = displayedRatings.indexOf(rating.id);
+                        if (index > -1) {
+                            displayedRatings.splice(index, 1); // Remove from displayed ratings after 5 seconds
+                            renderRatings(ratings); // Re-render ratings to remove the item
+                        }
+                    }, 5000);
+                }
+            });
+    
+            // Create a column for each team
+            Object.keys(ratingsByTeam).forEach(function(team) {
+                const ratingColumn = $('<div>').addClass('rating-column');
+                const teamHeading = $('<h2>').addClass('team-heading').text(team);
+    
+                const teamCount = ratingsByTeam[team].totalCount;
+                const teamCountElement = $('<div>').addClass('team-count').text(teamCount);
+                ratingColumn.append(teamCountElement);
+    
+                const emojis = ratingsByTeam[team].emojis;
+                emojis.forEach(function(emoji) {
+                    const ratingCard = $('<div>').addClass('rating-card');
+                    const emojiElement = $('<div>').addClass('emoji').text(getEmoji(emoji));
+                    ratingCard.append(emojiElement);
+                    ratingColumn.append(ratingCard);
+                });
+    
+                ratingsContainer.append(ratingColumn.prepend(teamHeading));
+            });
+    
+            // Remove any displayed ratings that are no longer present
+            const removedRatings = displayedRatings.filter(id => !ratings.find(rating => rating.id === id));
+            removedRatings.forEach(id => {
+                const index = displayedRatings.indexOf(id);
+                if (index > -1) {
+                    displayedRatings.splice(index, 1);
+                }
+            });
+        }
+    
+        // Function to fetch ratings data from the server
+        function fetchRatings() {
+            $.ajax({
+                url: '/ratings',
+                type: 'GET',
+                success: function(response) {
+                    const ratings = response.ratings;
+                    renderRatings(ratings);
+                }
+            });
+        }
+    
+        // Refresh ratings data every 500 milliseconds (0.5 seconds)
+        setInterval(fetchRatings, 500);
+    
+        // Initial fetch and render ratings data on page load
+        fetchRatings();
+    </script>
+    
+</body>
+</html>

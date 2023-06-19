@@ -1,16 +1,26 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 import qrcode
 import io
 import base64
+
 
 application = Flask(__name__, template_folder='templates')
 
 
 @application.route('/')
 def qrcodes():
-    qr_code_image_red_base64 = generate_qrcodes(color="red", payload="url-red")
-    qr_code_image_blue_base64 = generate_qrcodes(color="blue", payload="url-blue")
-    return render_template('qrcodes.html', qr_code_image_red_base64=qr_code_image_red_base64, qr_code_image_blue_base64=qr_code_image_blue_base64)
+    qr_payload = request.args.get('qrcode', '')
+    namespace = ''
+    with open('/var/run/secrets/kubernetes.io/serviceaccount/namespace', 'r') as file:
+        namespace = file.read().strip()
+    suffix_url = f"{namespace}.svc.cluster.local"
+    if qr_payload:
+        qr_code_image_generic_base64 = generate_qrcodes(color="black", payload=qr_payload)
+        return render_template('qrcode.html', qr_code_image_base64=qr_code_image_generic_base64, qr_payload=qr_payload)
+    else:
+        qr_code_image_red_base64 = generate_qrcodes(color="red", payload=f"http://red.{suffix_url}")
+        qr_code_image_blue_base64 = generate_qrcodes(color="blue", payload=f"http://blue.{suffix_url}")
+        return render_template('qrcodes.html', qr_code_image_red_base64=qr_code_image_red_base64, qr_code_image_blue_base64=qr_code_image_blue_base64)
 
 
 def generate_qrcodes(color, payload):
