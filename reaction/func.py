@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, jsonify, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from datetime import datetime
@@ -33,6 +33,16 @@ def index():
         db.session.commit()
 
     return render_template('index.html')
+
+@application.route('/health/readiness')
+def readiness_check():
+    # Perform any readiness checks here
+    return jsonify({'status': 'ready'})
+
+@application.route('/health/liveness')
+def liveness_check():
+    # Perform any liveness checks here
+    return jsonify({'status': 'alive'})
 
 
 

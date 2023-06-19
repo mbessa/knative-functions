@@ -33,6 +33,16 @@ def get_ratings():
     ratings_data = [{'name': rating.name, 'emoji': rating.emoji, 'team': rating.team} for rating in ratings]
     return jsonify({'ratings': ratings_data})
 
+@application.route('/health/readiness')
+def readiness_check():
+    # Perform any readiness checks here
+    return jsonify({'status': 'ready'})
+
+@application.route('/health/liveness')
+def liveness_check():
+    # Perform any liveness checks here
+    return jsonify({'status': 'alive'})
+
 
 if __name__ == '__main__':
     application.run()
